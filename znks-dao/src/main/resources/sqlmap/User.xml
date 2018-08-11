@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="GBK" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="User">
+    <resultMap type="com.sh.znks.domain.user.GeneralUser" id="GeneralUser">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="zn" column="zn"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="password" column="password"/>
+        <result property="passwordEncrypt" column="password_encrypt"/>
+        <result property="sex" column="sex"/>
+        <result property="age" column="age"/>
+        <result property="headImg" column="head_img"/>
+        <result property="phoneNumber" column="phone_number"/>
+        <result property="userType" column="user_type"/>
+        <result property="signature" column="signature"/>
+        <result property="userDescribe" column="user_describe"/>
+        <result property="grade" column="grade"/>
+        <result property="company" column="company"/>
+        <result property="province" column="province"/>
+        <result property="city" column="city"/>
+        <result property="longitude" column="longitude"/>
+        <result property="latitude" column="latitude"/>
+        <result property="accountNo" column="account_no"/>
+        <result property="accountType" column="account_type"/>
+        <result property="additional" column="additional"/>
+        <result property="rankings" column="rankings"/>
+        <result property="source" column="source"/>
+        <result property="status" column="status"/>
+        <result property="onOffLine" column="on_off_line"/>
+        <result property="created" column="created"/>
+        <result property="modified" column="modified"/>
+    </resultMap>
+    <resultMap type="com.sh.znks.domain.user.ExpertUser" id="ExpertUser">
+        <id property="id" column="id"/>
+        <result property="expertId" column="expert_id"/>
+        <result property="zn" column="zn"/>
+        <result property="expertNick" column="expert_nick"/>
+        <result property="password" column="password"/>
+        <result property="passwordEncrypt" column="password_encrypt"/>
+        <result property="headImg" column="head_img"/>
+        <result property="phoneNumber" column="phone_number"/>
+        <result property="province" column="province"/>
+        <result property="city" column="city"/>
+        <result property="longitude" column="longitude"/>
+        <result property="latitude" column="latitude"/>
+        <result property="expertType" column="expert_type"/>
+        <result property="level" column="level"/>
+        <result property="signature" column="signature"/>
+        <result property="userDescribe" column="user_describe"/>
+        <result property="accountNo" column="account_no"/>
+        <result property="accountType" column="account_type"/>
+        <result property="status" column="status"/>
+        <result property="onOffLine" column="on_off_line"/>
+        <result property="additional" column="additional"/>
+        <result property="created" column="created"/>
+        <result property="modified" column="modified"/>
+    </resultMap>
+    <sql id="generalFields">
+        user_id,zn,nick_name,password,password_encrypt,sex,age,head_img,phone_number,user_type,signature,
+        user_describe,grade,company,province,city,longitude,latitude,account_no,account_type,additional,
+        rankings,source,status,on_off_line,created
+    </sql>
+    <sql id="expertFields">
+        expert_id,zn,expert_nick,password,password_encrypt,head_img,phone_number,province,
+        city,longitude,latitude,expert_type,`level`,signature,user_describe,account_no,account_type,
+        status,on_off_line,additional,created
+    </sql>
+
+    <insert id="insertExpertUser" parameterType="ExpertUser" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO zn_expert_user(<include refid="expertFields"/>)
+        VALUES (#{expertId},#{zn},#{expertNick},#{password},#{passwordEncrypt},#{headImg},
+        #{phoneNumber},#{province},#{city},#{longitude},#{latitude},#{expertType},#{level},#{signature},
+        #{userDescribe},#{accountNo},#{accountType},#{status},#{onOffLine},#{additional},now())
+    </insert>
+
+    <select id="getExpertUserByExpertId" parameterType="java.util.List" resultMap="ExpertUser">
+        SELECT id,<include refid="expertFields"/>,modified
+        FROM zn_expert_user
+        WHERE expert_id IN (
+          <foreach collection="list" item="item" separator=",">
+            #{item}
+          </foreach>
+        )
+    </select>
+
+    <select id="getCountOfExpertUser" parameterType="ExpertUser" resultType="java.lang.Long">
+        SELECT count(1) FROM zn_expert_user
+        <where>
+            <if test="province != null">
+                province = #{province}
+            </if>
+            <if test="city != null">
+                AND city = #{city}
+            </if>
+            <if test="expertType != null">
+                AND expert_type = #{expertType}
+            </if>
+            <if test="level != null">
+                AND `level` = #{level}
+            </if>
+            <if test="accountType != null">
+                AND account_type = #{accountType}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="onOffLine != null">
+                AND on_off_line = #{onOffLine}
+            </if>
+        </where>
+    </select>
+
+    <select id="getExpertUserByPhone" parameterType="java.lang.String" resultMap="ExpertUser">
+        SELECT id,<include refid="expertFields"/>,modified
+        FROM zn_expert_user
+        WHERE phone_number = #{phoneNumber}
+    </select>
+
+    <select id="getGeneralUserByPhone" parameterType="java.lang.String" resultMap="GeneralUser">
+        SELECT id,<include refid="generalFields"/>,modified
+        FROM zn_general_user
+        WHERE phone_number = #{phoneNumber}
+    </select>
+    
+    <select id="getIdentifyCode" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT code FROM zn_identifying_code
+        WHERE phone_number = #{phoneNumber}
+        AND DATE_FORMAT(created,"%Y-%m-%d %H:%i:%s") &gt; DATE_ADD(DATE_FORMAT(NOW(),"%Y-%m-%d %H:%i:%s"), INTERVAL -30 MINUTE)
+        ORDER BY created DESC
+    </select>
+
+    <select id="getCountOfGeneralUser" parameterType="GeneralUser" resultType="java.lang.Long">
+        SELECT COUNT (1) FROM zn_general_user
+        <where>
+            <if test="province != null">
+                province = #{province}
+            </if>
+            <if test="city != null">
+                AND city = #{city}
+            </if>
+            <if test="user_type != null">
+                AND user_type = #{userType}
+            </if>
+            <if test="sex != null">
+                AND sex = #{sex}
+            </if>
+            <if test="age != null">
+                AND age = #{age}
+            </if>
+            <if test="grade != null">
+                AND grade = #{grade}
+            </if>
+            <if test="company != null">
+                AND company = #{company}
+            </if>
+            <if test="rankings != null">
+                AND rankings = #{rankings}
+            </if>
+            <if test="accountType != null">
+                AND account_type = #{accountType}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="source != null">
+                AND source = #{source}
+            </if>
+            <if test="onOffLine != null">
+                AND on_off_line = #{onOffLine}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertGeneralUser" parameterType="GeneralUser" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO zn_general_user(<include refid="generalFields"/>)
+        VALUES (#{userId},#{zn},#{nickName},#{password},#{passwordEncrypt},#{sex},#{age},#{headImg},
+        #{phoneNumber},#{userType},#{signature},#{userDescribe},#{grade},#{company},#{province},
+        #{city},#{longitude},#{latitude},#{accountNo},#{accountType},#{additional},#{rankings},
+        #{source},#{status},#{onOffLine},now())
+    </insert>
+
+    <insert id="insertIdentifyCode" parameterType="java.util.HashMap" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO zn_identifying_code(code,phone_number,created) VALUES (#{identifyCode},#{phoneNumber},now())
+    </insert>
+
+    <update id="updateGenInfoByPn" parameterType="GeneralUser" >
+        UPDATE zn_general_user
+        <set >
+            <if test="userId != null" >
+                user_id = #{userId},
+            </if>
+            <if test="zn != null" >
+                zn = #{zn},
+            </if>
+            <if test="nickName != null" >
+                nick_name = #{nickName},
+            </if>
+            <if test="password != null" >
+                password = #{password},
+            </if>
+            <if test="passwordEncrypt != null" >
+                password_encrypt = #{passwordEncrypt},
+            </if>
+            <if test="sex != null" >
+                sex = #{sex},
+            </if>
+            <if test="age != null" >
+                age = #{age},
+            </if>
+            <if test="headImg != null" >
+                head_img = #{headImg},
+            </if>
+            <if test="phoneNumber != null" >
+                phone_number = #{phoneNumber},
+            </if>
+            <if test="userType != null" >
+                user_type = #{userType},
+            </if>
+            <if test="signature != null" >
+                signature = #{signature},
+            </if>
+            <if test="userDescribe != null" >
+                user_describe = #{userDescribe},
+            </if>
+            <if test="grade != null" >
+                grade = #{grade},
+            </if>
+            <if test="company != null" >
+                company = #{company},
+            </if>
+            <if test="province != null" >
+                province = #{province},
+            </if>
+            <if test="city != null" >
+                city = #{city},
+            </if><if test="longitude != null" >
+                longitude = #{longitude},
+            </if>
+            <if test="latitude != null" >
+                latitude = #{latitude},
+            </if>
+            <if test="accountNo != null" >
+                account_no = #{accountNo},
+            </if>
+            <if test="accountType != null" >
+                account_type = #{accountType},
+            </if>
+            <if test="additional != null" >
+                additional = #{additional},
+            </if>
+            <if test="rankings != null" >
+                rankings = #{rankings},
+            </if>
+            <if test="source != null" >
+                source = #{source},
+            </if>
+            <if test="status != null" >
+                status = #{status},
+            </if>
+            <if test="onOffLine != null" >
+                on_off_line = #{onOffLine},
+            </if>
+                modified = now()
+        </set>
+        WHERE phone_number = #{phoneNumber}
+    </update>
+
+    <update id="updateExpInfoByPn" parameterType="ExpertUser" >
+        UPDATE zn_expert_user
+        <set >
+            <if test="expertId != null" >
+                expert_id = #{expertId},
+            </if>
+            <if test="zn != null" >
+                zn = #{zn},
+            </if>
+            <if test="expertNick != null" >
+                expert_nick = #{expertNick},
+            </if>
+            <if test="password != null" >
+                password = #{password},
+            </if>
+            <if test="passwordEncrypt != null" >
+                password_encrypt = #{passwordEncrypt},
+            </if>
+            <if test="headImg != null" >
+                head_img = #{headImg},
+            </if><if test="phoneNumber != null" >
+                phone_number = #{phoneNumber},
+            </if>
+            <if test="province != null" >
+                province = #{province},
+            </if>
+            <if test="city != null" >
+                city = #{city},
+            </if>
+            <if test="longitude != null" >
+                longitude = #{longitude},
+            </if><if test="latitude != null" >
+                latitude = #{latitude},
+            </if>
+            <if test="expertType != null" >
+                expert_type = #{expertType},
+            </if><if test="level != null" >
+                `level` = #{level},
+            </if>
+            <if test="signature != null" >
+                signature = #{signature},
+            </if>
+            <if test="userDescribe != null" >
+                user_describe = #{userDescribe},
+            </if><if test="accountNo != null" >
+                account_no = #{accountNo},
+            </if>
+            <if test="accountType != null" >
+                account_type = #{accountType},
+            </if>
+            <if test="status != null" >
+                status = #{status},
+            </if>
+            <if test="onOffLine != null" >
+                on_off_line = #{onOffLine},
+            </if>
+            <if test="additional != null" >
+                additional = #{additional},
+            </if>
+                modified = now()
+        </set>
+        WHERE phone_number = #{phoneNumber}
+    </update>
+
+</mapper>

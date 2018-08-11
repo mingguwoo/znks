@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="GBK" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Answer">
+    <resultMap id="Answer" type="com.sh.znks.domain.aq.Answer">
+        <id property="id" column="id"/>
+        <result property="answerId" column="answer_id"/>
+        <result property="questionId" column="question_id"/>
+        <result property="answerDetail" column="answer_detail"/>
+        <result property="userId" column="user_id"/>
+        <result property="userZn" column="user_zn"/>
+        <result property="result" column="result"/>
+        <result property="expertId" column="expert_id"/>
+        <result property="expertZn" column="expert_zn"/>
+        <result property="basis" column="basis"/>
+        <result property="judgeTime" column="judge_time"/>
+        <result property="status" column="status"/>
+        <result property="created" column="created"/>
+        <result property="modified" column="modified"/>
+    </resultMap>
+
+    <sql id="fieldsA">
+        answer_id,question_id,answer_detail,user_id,user_zn,result,expert_id,expert_zn,basis,judge_time,status,created
+    </sql>
+
+    <insert id="insertAnswer" parameterType="Answer" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO zn_answer(<include refid="fieldsA"/>)
+        VALUES (#{answerId},#{questionId},#{answerDetail},#{userId},#{userZn},#{result},#{expertId},
+        #{expertZn},#{basis},#{judgeTime},#{status},now())
+    </insert>
+
+    <select id="getAnswerIdMax" resultType="java.lang.String">
+        SELECT answer_id FROM zn_answer ORDER BY answer_id DESC LIMIT 1
+    </select>
+
+    <select id="getAnswerInfos" parameterType="com.sh.znks.domain.dto.AnswerCondition" resultMap="Answer">
+        SELECT id,<include refid="fieldsA"/>,modified
+        FROM zn_answer
+        <where>
+            <if test="answerId != null">
+                answer_id = #{answerId}
+            </if>
+            <if test="questionId != null">
+                AND question_id = #{questionId}
+            </if>
+            <if test="answerDetail != null and answerDetail.length() &gt; 0">
+                AND answer_detail LIKE concat('%',#{answerDetail},'%')
+            </if>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="userZn != null and userZn.length() &gt; 0">
+                AND user_zn = #{userZn}
+            </if>
+            <if test="result != null and result.length() &gt; 0">
+                AND result LIKE concat('%',#{result},'%')
+            </if>
+            <if test="expertId != null">
+                AND expert_id = #{expertId}
+            </if>
+            <if test="expertZn != null and expertZn.length() &gt; 0">
+                AND expert_zn = #{expertZn}
+            </if>
+            <if test="basis != null and basis.length() &gt; 0">
+                AND basis LIKE concat('%',#{basis},'%')
+            </if>
+            <if test="judgeTime != null">
+                AND judge_time LIKE concat('%',#{judgeTime},'%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="created != null">
+                AND created LIKE concat('%',#{created},'%')
+            </if>
+            <if test="modified != null">
+                AND modified LIKE concat('%',#{modified},'%')
+            </if>
+        </where>
+        ORDER BY created DESC
+        limit #{start},#{size}
+    </select>
+
+    <select id="getAnswerInfoByQueList" parameterType="java.util.HashMap" resultMap="Answer">
+        SELECT id,<include refid="fieldsA"/>,modified
+        FROM zn_answer
+        <where>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="userZn != null and userZn.length() &gt; 0">
+                AND user_zn = #{userZn}
+            </if>
+            <if test="questionIdList != null and questionIdList.size > 0 ">
+                AND question_id IN
+                <foreach collection = "questionIdList" item="item"  open = "(" close = ")" separator = ",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    
+    <update id="updateAnswerResult" parameterType="com.sh.znks.domain.dto.JudgementParam">
+        UPDATE zn_answer
+        <trim prefix="set" suffixOverrides=",">
+            <if test="result != null">
+                result = #{result},
+            </if>
+            <if test="basis != null and basis.length() &gt; 0">
+                basis = #{basis},
+            </if>
+            <if test="judgeTime != null">
+                judge_time = #{judgeTime},
+            </if>
+            <if test="judgementId != null">
+                expert_id = #{judgementId},
+            </if>
+            <if test="judgementZn != null and judgementZn.length() &gt; 0">
+                expert_zn = #{judgementZn},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+                modified = now()
+        </trim>
+        WHERE answer_id = #{answerId}
+        AND question_id = #{questionId}
+        AND status = 1
+    </update>
+
+</mapper>

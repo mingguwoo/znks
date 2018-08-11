@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="GBK"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>znks</artifactId>
+        <groupId>com.sh.znks</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <name>cache</name>
+    <artifactId>znks-cache</artifactId>
+
+    <!--<dependencies>
+        <dependency>
+            <groupId>XXXXXXXX</groupId>
+            <artifactId>XXXXXXXX</artifactId>
+            <version>XX.XX.XX</version>
+        </dependency>
+    </dependencies>-->
+
+</project>

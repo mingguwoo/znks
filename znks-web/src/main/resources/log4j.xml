@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="GBK"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d [%7r] %6p - %c - %m \n"/>
+        </layout>
+    </appender>
+
+    <appender name="FILE" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="DatePattern" value="'.'yyyy-MM-dd"/>
+        <param name="Append" value="true"/>
+        <param name="file" value="${serverside.log.path}/serverside.log"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d [%7r] %6p - %c - %m \n"/>
+        </layout>
+        <filter class="org.apache.log4j.varia.LevelRangeFilter">
+            <param name="LevelMin" value="${serverside.log.level}"/>
+            <!--<param name="LevelMax" value="FATAL "/> -->
+        </filter>
+    </appender>
+
+    <category name="com.sh" additivity="false">
+        <priority value="${serverside.log.level}"/>
+        <appender-ref ref="${serverside.log.appender}"/>
+    </category>
+
+    <root>
+        <priority value="${serverside.log.level}"/>
+        <appender-ref ref="${serverside.log.appender}"/>
+    </root>
+</log4j:configuration>

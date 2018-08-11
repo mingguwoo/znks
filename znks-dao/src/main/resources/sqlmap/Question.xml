@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="GBK" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Question">
+    <resultMap id="Question" type="com.sh.znks.domain.aq.Question">
+        <id property="id" column="id"/>
+        <result property="questionId" column="question_id"/>
+        <result property="grade" column="grade"/>
+        <result property="subjectId" column="subject_id"/>
+        <result property="questionType" column="question_type"/>
+        <result property="questionDescribe" column="question_describe"/>
+        <result property="option1" column="option_1"/>
+        <result property="option2" column="option_2"/>
+        <result property="option3" column="option_3"/>
+        <result property="option4" column="option_4"/>
+        <result property="option5" column="option_5"/>
+        <result property="option6" column="option_6"/>
+        <result property="option7" column="option_7"/>
+        <result property="option8" column="option_8"/>
+        <result property="option9" column="option_9"/>
+        <result property="option10" column="option_10"/>
+        <result property="tips" column="tips"/>
+        <result property="standardAnswer" column="standard_answer"/>
+        <result property="difficultyLevel" column="difficulty_level"/>
+        <result property="questionValue" column="question_value"/>
+        <result property="expertId" column="expert_id"/>
+        <result property="expertZn" column="expert_zn"/>
+        <result property="status" column="status"/>
+        <result property="created" column="created"/>
+        <result property="modified" column="modified"/>
+    </resultMap>
+
+    <sql id="fieldsQ">
+        question_id,grade,subject_id,question_type,question_describe,option_1,option_2,option_3,option_4,
+        option_5,option_6,option_7,option_8,option_9,option_10,tips,standard_answer,difficulty_level,
+        question_value,expert_id,expert_zn,status,created
+    </sql>
+
+    <insert id="insertQuestion" parameterType="Question" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO zn_questions(<include refid="fieldsQ"/>)
+        VALUES (#{questionId},#{grade},#{subjectId},#{questionType},#{questionDescribe},#{option1},#{option2},
+        #{option3},#{option4},#{option5},#{option6},#{option7},#{option8},#{option9},#{option10},#{tips},
+        #{standardAnswer},#{difficultyLevel},#{questionValue},#{expertId},#{expertZn},#{status},now())
+    </insert>
+
+    <select id="getQuestionIdMax" resultType="java.lang.String">
+        SELECT question_id FROM zn_questions ORDER BY question_id DESC LIMIT 1
+    </select>
+
+    <select id="getQuestionInfos" parameterType="com.sh.znks.domain.dto.QuestionCondition" resultMap="Question">
+        SELECT id,<include refid="fieldsQ"/>,modified
+        FROM zn_questions
+        <where>
+            <if test="questionId != null">
+                question_id = #{questionId}
+            </if>
+            <if test="grade != null and grade &gt; 0 and grade &lt; 13">
+                AND grade = #{grade}
+            </if>
+            <if test="subjectId != null">
+                AND subject_id = #{subjectId}
+            </if>
+            <if test="questionType != null">
+                AND question_type = #{questionType}
+            </if>
+            <if test="questionDescribe != null and questionDescribe.length() &gt; 0">
+                AND question_describe LIKE concat('%',#{questionDescribe},'%')
+            </if>
+            <if test="difficultyLevel != null">
+                AND difficulty_level = #{difficultyLevel}
+            </if>
+            <if test="questionValue != null">
+                AND question_value = #{questionValue}
+            </if>
+            <if test="expertId != null">
+                AND expert_id = #{expertId}
+            </if>
+            <if test="expertZn != null and expertZn.length() &gt; 0">
+                AND expert_zn LIKE concat('%',#{expertZn},'%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="created != null">
+                AND created LIKE concat('%',#{created},'%')
+            </if>
+            <if test="modified != null">
+                AND modified LIKE concat('%',#{modified},'%')
+            </if>
+        </where>
+        ORDER BY created DESC
+        limit #{start},#{size}
+    </select>
+
+    <select id="getQuestionInfoByQueList" parameterType="java.util.HashMap" resultMap="Question">
+        SELECT id,<include refid="fieldsQ"/>,modified
+        FROM zn_questions
+        <where>
+            <if test="expertId != null">
+                AND expert_id = #{expertId}
+            </if>
+            <if test="expertZn != null and expertZn.length() &gt; 0">
+                AND expert_zn = #{expertZn}
+            </if>
+            <if test="questionIdList != null and questionIdList.size > 0 ">
+                AND question_id IN
+                <foreach collection = "questionIdList" item="item"  open = "(" close = ")" separator = ",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+</mapper>
