@@ -31,7 +31,7 @@ public class DemoFirstController {
     public String demoFirst() {
         String url = "http://localhost:8080/login/expert/pwdExpLogin";
         Map<String,String> param = new HashMap<String,String>();
-        param.put("phoneNumber111","18702103770");
+        param.put("phoneNumber","18702103770");
         param.put("passwordEncrypt","z2c1WjMz5uFDQ5FhrcLYLg==");
         JSONObject ob = JSONObject.fromObject(param);
         JSONObject js = HttpRequestUtils.httpPost(url, ob);
