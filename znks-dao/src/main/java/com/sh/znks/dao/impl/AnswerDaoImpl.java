@@ -37,8 +37,8 @@ public class AnswerDaoImpl implements AnswerDao {
     }
 
     @Override
-    public int insertAnswer(Answer answer) {
-        return znksSqlSession.insert("Answer.insertAnswer", answer);
+    public int insertAnswers(List<Answer> answers) {
+        return znksSqlSession.insert("Answer.insertAnswers", answers);
     }
 
     @Override

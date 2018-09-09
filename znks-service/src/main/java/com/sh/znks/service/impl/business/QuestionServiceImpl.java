@@ -13,6 +13,7 @@ import com.sh.znks.dao.QuestionDao;
 import com.sh.znks.domain.aq.Answer;
 import com.sh.znks.domain.aq.Question;
 import com.sh.znks.domain.dto.AnswerCondition;
+import com.sh.znks.domain.dto.AnswerParam;
 import com.sh.znks.domain.dto.JudgementParam;
 import com.sh.znks.domain.dto.QuestionCondition;
 import com.sh.znks.domain.dto.QuestionParam;
@@ -179,20 +180,30 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public ResultResponse submitAnswer(String questionId, String answerDetail, String userId, String userZn) {
+    public ResultResponse submitAnswer(List<AnswerParam> params) {
         //参数校验
         GeneralUser user = AuthorHolder.getGeneralAuthor();
         if (user == null)
             return new ResultResponse(ResultCodeEnum.ZN_NO_LOGIN);
 
-        if (!userId.equals(user.getUserId()))
-            return new ResultResponse(ResultCodeEnum.ZN_PARAM_ERR);
+        //参数编辑
         try {
-            //参数编辑
+            Integer answerIdInt;
             String answerId = answerDao.getAnswerIdMax();
-            Answer an = ParamEditUtils.editDeployAnswer(questionId, answerDetail, userId, userZn, answerId);
+            if (StringUtils.isEmpty(answerId))
+                answerIdInt = 1;
+            else
+                answerIdInt = Integer.parseInt(answerId);
+            List<Answer> answers = new ArrayList<Answer>();
+            for (AnswerParam param : params) {
+                if (!param.getUserId().equals(user.getUserId()))
+                    return new ResultResponse(ResultCodeEnum.ZN_PARAM_ERR);
+                Answer an = ParamEditUtils.editDeployAnswer(param, answerIdInt);
+                answerIdInt++;
+                answers.add(an);
+            }
 
-            int res = answerDao.insertAnswer(an);
+            int res = answerDao.insertAnswers(answers);
             if (res <= Constant.ZERO)
                 return new ResultResponse(ResultCodeEnum.ZN_SYS_ERR);
             return new ResultResponse(ResultCodeEnum.ZN_OK);

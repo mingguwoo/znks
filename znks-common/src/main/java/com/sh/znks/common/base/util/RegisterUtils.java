@@ -4,6 +4,7 @@ import com.sh.znks.common.base.Constant;
 import com.sh.znks.domain.register.User;
 import com.sh.znks.domain.user.ExpertUser;
 import com.sh.znks.domain.user.GeneralUser;
+import com.sh.znks.domain.user.WxUser;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -260,5 +261,48 @@ public class RegisterUtils {
         expertUser.setUserDescribe(user.getUserDescribe());
 
         return expertUser;
+    }
+
+    /**
+     * 编辑注册的入参(微信)
+     */
+    public static WxUser InputWxParamSet(HttpServletRequest request) {
+
+        WxUser user = new WxUser();
+        String unionId = request.getParameter("unionId");
+        String latitude = request.getParameter("latitude");
+        String longitude = request.getParameter("longitude");
+        String nickName = request.getParameter("nickName");
+        String avatarUrl = request.getParameter("avatarUrl");
+        String gender = request.getParameter("gender");
+        String phoneNumber = request.getParameter("phoneNumber");
+        String purePhoneNumber = request.getParameter("purePhoneNumber");
+        String countryCode = request.getParameter("countryCode");
+        String brand = request.getParameter("brand");
+        String model = request.getParameter("model");
+        String version = request.getParameter("version");
+        String platform = request.getParameter("platform");
+        String city = request.getParameter("city");
+        String province = request.getParameter("province");
+        String country = request.getParameter("country");
+
+        user.setUnionId(unionId);
+        user.setLatitude(latitude);
+        user.setLongitude(longitude);
+        user.setNickName(nickName);
+        user.setAvatarUrl(avatarUrl);
+        user.setGender(gender);
+        user.setPhoneNumber(phoneNumber);
+        user.setPurePhoneNumber(purePhoneNumber);
+        user.setCountryCode(countryCode);
+        user.setBrand(brand);
+        user.setModel(model);
+        user.setVersion(version);
+        user.setPlatform(platform);
+        user.setCity(city);
+        user.setProvince(province);
+        user.setCountry(country);
+
+        return user;
     }
 }

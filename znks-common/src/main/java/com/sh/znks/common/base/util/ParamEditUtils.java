@@ -1,13 +1,21 @@
 package com.sh.znks.common.base.util;
 
+import com.sh.znks.common.base.AuthorHolder;
 import com.sh.znks.common.base.Constant;
 import com.sh.znks.domain.aq.Answer;
 import com.sh.znks.domain.aq.Question;
+import com.sh.znks.domain.dto.AnswerParam;
 import com.sh.znks.domain.dto.QuestionCondition;
 import com.sh.znks.domain.dto.QuestionParam;
 import com.sh.znks.domain.user.ExpertUser;
 import com.sh.znks.domain.user.GeneralUser;
+import com.sh.znks.domain.user.WxUser;
+
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
 
 /**
  * Created by wuminggu on 2018/7/5.
@@ -109,6 +117,8 @@ public class ParamEditUtils {
             question.setDifficultyLevel(Constant.ONE);
         if (StringUtils.isNotBlank(param.getExpertZn()))
             question.setExpertZn(param.getExpertZn());
+        if (StringUtils.isNotBlank(param.getKnowledge()))
+            question.setKnowledge(param.getKnowledge());
         question.setQuestionDescribe(param.getQuestionDescribe());
         question.setStandardAnswer(param.getStandardAnswer());
         question.setExpertId(param.getExpertId());
@@ -165,20 +175,69 @@ public class ParamEditUtils {
     /**
      * 插入答案信息的参数编辑
      */
-    public static Answer editDeployAnswer(String questionId, String answerDetail, String userId, String userZn, String answerId) {
+    public static Answer editDeployAnswer(AnswerParam param, Integer answerId) {
         //编辑参数
         Answer an = new Answer();
-        if (StringUtils.isEmpty(answerId))
-            answerId = "1";
-        else
-            answerId = (Integer.parseInt(answerId) + 1) + Constant.BLANK;
-        an.setAnswerId(answerId);
-        an.setUserId(userId);
-        an.setUserZn(userZn);
-        an.setQuestionId(questionId);
-        an.setAnswerDetail(answerDetail);
+        an.setAnswerId(answerId+ Constant.BLANK);
+        an.setUserId(param.getUserId());
+        an.setUserZn(param.getUserZn());
+        an.setQuestionId(param.getQuestionId());
+        an.setAnswerDetail(param.getAnswerDetail());
         an.setStatus(Constant.ONE);
 
         return an;
+    }
+
+    /**
+     * 生成微信登录凭证校验接口url
+     * @param authorizationCode
+     * @return
+     */
+    public static String getWxUrl(String wxurl, String appid, String secret, String authorizationCode) {
+        StringBuilder wxUrlStr = new StringBuilder();
+        wxUrlStr.append(wxurl);
+        wxUrlStr.append("appid=");
+        wxUrlStr.append(appid);
+        wxUrlStr.append("&secret=");
+        wxUrlStr.append(secret);
+        wxUrlStr.append("&js_code=");
+        wxUrlStr.append(authorizationCode);
+        wxUrlStr.append("&grant_type=authorization_code");
+
+        return wxUrlStr.toString();
+    }
+
+    /**
+     * 获取用户登录授权token
+     * @param openid
+     * @param sessionKey
+     * @return
+     */
+    public static String getToken(String openid, String sessionKey) {
+        Date now = new Date();
+        String timeStamp = String.valueOf(now.getTime());
+        String token = openid + "_" + sessionKey + "_" + timeStamp;
+        return token;
+    }
+
+    public static boolean checkTokenAvailability(String token) {
+        boolean isAvailable = false;
+        if (StringUtils.isBlank(token)) {
+            return isAvailable;
+        }
+
+        String[] tokenParam = token.split("_");
+        String openid = tokenParam[0];
+        String sessionKey = tokenParam[1];
+        if (StringUtils.isBlank(openid) || StringUtils.isBlank(sessionKey)) {
+            return isAvailable;
+        }
+
+        WxUser wxUser = AuthorHolder.getWxAuthor();
+        if (wxUser != null && openid.equals(wxUser.getOpenid()) && sessionKey.equals(wxUser.getSessionKey())) {
+            isAvailable = true;
+        }
+
+        return isAvailable;
     }
 }

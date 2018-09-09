@@ -29,6 +29,7 @@ public class Question {
     private String expertId;            //出题者id/专家id
     private String expertZn;            //出题者名称/专家名称
     private Integer status;             //题目状态:0未通过、1通过、2审核中
+    private String knowledge;           //知识点
     private Date created;               //创建时间
     private Date modified;              //更新时间
 
@@ -219,6 +220,14 @@ public class Question {
         this.status = status;
     }
 
+    public String getKnowledge() {
+        return knowledge;
+    }
+
+    public void setKnowledge(String knowledge) {
+        this.knowledge = knowledge;
+    }
+
     public Date getCreated() {
         return created;
     }
@@ -261,6 +270,7 @@ public class Question {
                 ", expertId='" + expertId + '\'' +
                 ", expertZn='" + expertZn + '\'' +
                 ", status=" + status +
+                ", knowledge='" + knowledge + '\'' +
                 ", created=" + created +
                 ", modified=" + modified +
                 '}';

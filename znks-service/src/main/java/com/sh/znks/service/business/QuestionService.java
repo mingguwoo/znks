@@ -1,9 +1,12 @@
 package com.sh.znks.service.business;
 
 import com.sh.znks.common.result.ResultResponse;
+import com.sh.znks.domain.dto.AnswerParam;
 import com.sh.znks.domain.dto.JudgementParam;
 import com.sh.znks.domain.dto.QuestionCondition;
 import com.sh.znks.domain.dto.QuestionParam;
+
+import java.util.List;
 
 /**
  * Created by wuminggu on 2018/7/5.
@@ -33,13 +36,10 @@ public interface QuestionService {
 
     /**
      * 提交答案
-     * @param questionId
-     * @param answerDetail
-     * @param userId
-     * @param userZn
+     * @param params
      * @return
      */
-    public ResultResponse submitAnswer(String questionId, String answerDetail, String userId, String userZn);
+    public ResultResponse submitAnswer(List<AnswerParam> params);
 
     /**
      * 查询已答题列表

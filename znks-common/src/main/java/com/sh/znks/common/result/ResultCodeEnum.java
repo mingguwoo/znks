@@ -16,7 +16,8 @@ public enum  ResultCodeEnum {
     ZN_UPDATE_FAIL(9, "update is fail"),
     ZN_SYS_ERR(-1, "system error"),
     ZN_QUESTION_EXIST(10, "This question has exist"),
-    ZN_NO_LOGIN(11, "no login");
+    ZN_NO_LOGIN(11, "no login"),
+    ZN_UNIONID_IS_NULL(12, "UnionId is null");
 
     private int code;
     private String msg;

@@ -25,10 +25,10 @@ public interface AnswerDao {
 
     /**
      * 提交答案信息
-     * @param answer
+     * @param answers
      * @return
      */
-    public int insertAnswer(Answer answer);
+    public int insertAnswers(List<Answer> answers);
 
     /**
      * 根据questionIdList取得答案List

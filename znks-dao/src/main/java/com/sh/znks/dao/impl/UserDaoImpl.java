@@ -3,6 +3,7 @@ package com.sh.znks.dao.impl;
 import com.sh.znks.dao.UserDao;
 import com.sh.znks.domain.user.ExpertUser;
 import com.sh.znks.domain.user.GeneralUser;
+import com.sh.znks.domain.user.WxUser;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
@@ -80,5 +81,15 @@ public class UserDaoImpl implements UserDao {
     @Override
     public int updateExpInfoByPn(ExpertUser user) {
         return znksSqlSession.update("User.updateExpInfoByPn", user);
+    }
+
+    @Override
+    public WxUser getWxUserByUnionid(String unionId) {
+        return znksSqlSession.selectOne("WxUser.getWxUserByUnionid", unionId);
+    }
+
+    @Override
+    public int insertWxUser(WxUser wxUser) {
+        return znksSqlSession.insert("WxUser.insertWxUser", wxUser);
     }
 }

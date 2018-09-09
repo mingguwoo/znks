@@ -6,7 +6,6 @@ import com.sh.znks.domain.register.User;
  * Created by wuminggu on 2018/5/8.
  */
 public class GeneralUser extends User {
-
     private String userId;              //用户id
     private String nickName;            //用户昵称
     private Integer sex;                //性别：0女、1男

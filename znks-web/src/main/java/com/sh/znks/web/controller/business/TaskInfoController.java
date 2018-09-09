@@ -2,11 +2,13 @@ package com.sh.znks.web.controller.business;
 
 import com.sh.znks.common.result.ResultCodeEnum;
 import com.sh.znks.common.result.ResultResponse;
+import com.sh.znks.domain.dto.AnswerParam;
 import com.sh.znks.domain.dto.JudgementParam;
 import com.sh.znks.domain.dto.QuestionCondition;
 import com.sh.znks.domain.dto.QuestionParam;
 import com.sh.znks.service.business.QuestionService;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
 
 /**
  * Created by wuminggu on 2018/6/14.
@@ -60,16 +64,13 @@ public class TaskInfoController {
 
     @RequestMapping(value = "/submitAnswer", method = RequestMethod.POST)
     @ResponseBody
-    public ResultResponse submitAnswer(String questionId, String answerDetail, String userId, String userZn) {
+    public ResultResponse submitAnswer(List<AnswerParam> params) {
         //校验必填项
-        if (StringUtils.isBlank(questionId)
-                || StringUtils.isBlank(answerDetail)
-                || StringUtils.isBlank(userId)
-                || StringUtils.isBlank(userZn)) {
+        if (CollectionUtils.isEmpty(params)) {
             return new ResultResponse(ResultCodeEnum.ZN_PARAM_ERR);
         }
 
-        return questionService.submitAnswer(questionId,answerDetail,userId,userZn);
+        return questionService.submitAnswer(params);
     }
 
     @RequestMapping(value = "/getJudgementList", method = RequestMethod.POST)
@@ -93,9 +94,8 @@ public class TaskInfoController {
     @ResponseBody
     public ResultResponse submitJudgementResult(JudgementParam param) {
         //校验必填项
-        if (param == null
+        if (StringUtils.isBlank(param.getAnswerId())
                 || StringUtils.isBlank(param.getQuestionId())
-                || StringUtils.isBlank(param.getAnswerId())
                 || param.getResult() == null) {
             return new ResultResponse(ResultCodeEnum.ZN_PARAM_ERR);
         }

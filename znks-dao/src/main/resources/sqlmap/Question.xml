@@ -27,6 +27,7 @@
         <result property="expertId" column="expert_id"/>
         <result property="expertZn" column="expert_zn"/>
         <result property="status" column="status"/>
+        <result property="knowledge" column="knowledge"/>
         <result property="created" column="created"/>
         <result property="modified" column="modified"/>
     </resultMap>
@@ -34,14 +35,14 @@
     <sql id="fieldsQ">
         question_id,grade,subject_id,question_type,question_describe,option_1,option_2,option_3,option_4,
         option_5,option_6,option_7,option_8,option_9,option_10,tips,standard_answer,difficulty_level,
-        question_value,expert_id,expert_zn,status,created
+        question_value,expert_id,expert_zn,status,knowledge,created
     </sql>
 
     <insert id="insertQuestion" parameterType="Question" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO zn_questions(<include refid="fieldsQ"/>)
         VALUES (#{questionId},#{grade},#{subjectId},#{questionType},#{questionDescribe},#{option1},#{option2},
         #{option3},#{option4},#{option5},#{option6},#{option7},#{option8},#{option9},#{option10},#{tips},
-        #{standardAnswer},#{difficultyLevel},#{questionValue},#{expertId},#{expertZn},#{status},now())
+        #{standardAnswer},#{difficultyLevel},#{questionValue},#{expertId},#{expertZn},#{status},#{knowledge},now())
     </insert>
 
     <select id="getQuestionIdMax" resultType="java.lang.String">

@@ -6,7 +6,6 @@ import java.util.Date;
  * Created by wuminggu on 2018/5/10.
  */
 public class User {
-
     private Long id;                    //主键、自增id
     private String zn;                  //ZN
     private String headImg;             //头像链接

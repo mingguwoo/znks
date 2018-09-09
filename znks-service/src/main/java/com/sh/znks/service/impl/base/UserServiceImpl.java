@@ -2,6 +2,7 @@ package com.sh.znks.service.impl.base;
 
 import com.sh.znks.common.base.AuthorHolder;
 import com.sh.znks.common.base.Constant;
+import com.sh.znks.common.base.http.HttpRequestUtils;
 import com.sh.znks.common.base.util.JsonUtils;
 import com.sh.znks.common.base.util.ParamEditUtils;
 import com.sh.znks.common.base.util.RedisKeyConstant;
@@ -12,16 +13,20 @@ import com.sh.znks.common.result.ResultResponse;
 import com.sh.znks.dao.UserDao;
 import com.sh.znks.domain.user.ExpertUser;
 import com.sh.znks.domain.user.GeneralUser;
+import com.sh.znks.domain.user.WxUser;
 import com.sh.znks.service.base.UserService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import sun.misc.BASE64Encoder;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by wuminggu on 2018/5/9.
@@ -29,6 +34,13 @@ import java.security.NoSuchAlgorithmException;
 @Service("userService")
 public class UserServiceImpl implements UserService {
     private final static Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
+
+    @Value("${zn.appid}")
+    private String appid;
+    @Value("${zn.appsecret}")
+    private String secret;
+    @Value("${zn.wx.url}")
+    private String wxurl;
 
     @Autowired
     private UserDao userDao;
@@ -421,12 +433,78 @@ public class UserServiceImpl implements UserService {
                 return new ResultResponse(ResultCodeEnum.ZN_SYS_ERR);
             }
         } catch (Exception e) {
-            log.error("L510_updateExpInfosExp e:", e);
+            log.error("L538_updateExpInfosExp e:", e);
             return new ResultResponse(ResultCodeEnum.ZN_SYS_ERR);
         }
 
         return new ResultResponse(ResultCodeEnum.ZN_OK);
     }
 
+    @Override
+    public ResultResponse getxAuthorizationGenLoginInfo(String authorizationCode) {
+        Map<String, Object> resultMap = new HashMap<>();
+        // 取得请求微信登录凭证校验接口的url
+        String wxUrl = ParamEditUtils.getWxUrl(wxurl, appid, secret, authorizationCode);
+        try {
+            Map resMap = HttpRequestUtils.httpGet(wxUrl);
+//            Integer errcode = (Integer) resMap.get("errcode");
+//            String errmsg = (String) resMap.get("errmsg");
 
+            String openid = (String) resMap.get("openid");
+            String sessionKey = (String) resMap.get("session_key");
+            String unionId = (String) resMap.get("unionid");
+//            openid = "wx3f42776e16a6d94b";
+//            sessionKey = "7a4c32def6f73a1e229b05dd1894dbb3";
+//            unionId = "zn123456789";
+            if (StringUtils.isBlank(openid) || StringUtils.isBlank(sessionKey)) {
+                log.error("L461_getxAuthorizationGenLoginInfo res is {}", JsonUtils.toJson(resMap));
+                return new ResultResponse(ResultCodeEnum.ZN_PARAM_ERR);
+            }
+
+            boolean isRegistered = false;
+            WxUser wxUser = new WxUser();
+            if (StringUtils.isNotBlank(unionId)) {
+                //查询是否已注册用户信息
+                wxUser = userDao.getWxUserByUnionid(unionId);
+                if (StringUtils.isNotBlank(wxUser.getNickName())) {
+                    isRegistered = true;
+                }
+            }
+            //将openid、sessionKey放到AuthHolder中
+            wxUser.setOpenid(openid);
+            wxUser.setSessionKey(sessionKey);
+            AuthorHolder.setWxAuthor(wxUser);
+
+            //取得授权登录token
+            String token = ParamEditUtils.getToken(openid, sessionKey);
+
+            resultMap.put("token", token);
+            resultMap.put("isRegistered", isRegistered);
+        } catch (Exception e) {
+            log.error("L485_getxAuthorizationGenLoginInfoExp e:", e);
+            return new ResultResponse(ResultCodeEnum.ZN_SYS_ERR);
+        }
+
+        return new ResultResponse(ResultCodeEnum.ZN_OK, resultMap);
+    }
+
+    @Override
+    public ResultResponse registerWxUser(WxUser user) {
+        try {
+            //查询用户是否已经注册(根据UnionId)
+            WxUser wxUser = userDao.getWxUserByUnionid(user.getUnionId());
+            //用户已注册
+            if (wxUser != null && StringUtils.isNotBlank(wxUser.getNickName()))
+                return new ResultResponse(ResultCodeEnum.ZN_USER_REGISTERED);
+
+            int res = userDao.insertWxUser(user);
+            if (res <= Constant.ZERO)
+                return new ResultResponse(ResultCodeEnum.ZN_SYS_ERR);
+        } catch (Exception e) {
+            log.error("L505_register e:", e);
+            return new ResultResponse(ResultCodeEnum.ZN_SYS_ERR);
+        }
+
+        return new ResultResponse(ResultCodeEnum.ZN_OK);
+    }
 }

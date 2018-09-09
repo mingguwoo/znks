@@ -24,6 +24,7 @@ public class QuestionParam {
     private Integer questionValue;      //问题价值（0-5滴血）
     private String expertId;            //出题者id/专家id
     private String expertZn;            //出题者ZN/专家ZN
+    private String knowledge;           //知识点
 
     public Integer getGrade() {
         return grade;
@@ -183,5 +184,13 @@ public class QuestionParam {
 
     public void setExpertZn(String expertZn) {
         this.expertZn = expertZn;
+    }
+
+    public String getKnowledge() {
+        return knowledge;
+    }
+
+    public void setKnowledge(String knowledge) {
+        this.knowledge = knowledge;
     }
 }

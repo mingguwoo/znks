@@ -15,6 +15,12 @@
         <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>
 
+    <!-- 该 BeanPostProcessor 将自动对标注 @Autowired 的 Bean 进行注入 -->
+    <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
+
+    <!-- <mvc:annotation-driven /> 会自动注册DefaultAnnotationHandlerMapping与AnnotationMethodHandlerAdapter 两个bean,
+        是spring MVC为@Controllers分发请求所必须的。并提供了：数据绑定支持，@NumberFormatannotation支持，@DateTimeFormat支持，
+        @Valid支持，读写XML的支持（JAXB），读写JSON的支持（Jackson）。 -->
     <mvc:annotation-driven>
         <!-- 处理responseBody 里面日期类型 -->
         <!--<mvc:message-converters>
@@ -34,19 +40,26 @@
         </mvc:message-converters>-->
     </mvc:annotation-driven>
 
+    <!-- <mvc:default-servlet-handler/> 使用默认的Servlet来响应静态文件。不可以找不到静态文件报404。-->
     <mvc:default-servlet-handler/>
 
     <mvc:interceptors>
-        <mvc:interceptor>
+        <!--<mvc:interceptor>
             <mvc:mapping path="/**"/>
             <mvc:exclude-mapping path="/demo/first/demoFirst"/>
             <mvc:exclude-mapping path="/register/general"/>
             <mvc:exclude-mapping path="/register/expert"/>
             <ref bean="accessInterceptor"/>
+        </mvc:interceptor>-->
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <mvc:exclude-mapping path="/login/general/wxAuthorizationGenLogin"/>
+            <ref bean="wxAccessInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>
 
     <bean id="accessInterceptor" class="com.sh.znks.web.interceptor.AccessInterceptor"/>
+    <bean id="wxAccessInterceptor" class="com.sh.znks.web.interceptor.WxAccessInterceptor"/>
 
     <!-- 需要文件上传功能时，启用以下配置 -->
     <!--<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">

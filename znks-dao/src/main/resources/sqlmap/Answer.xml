@@ -24,10 +24,14 @@
         answer_id,question_id,answer_detail,user_id,user_zn,result,expert_id,expert_zn,basis,judge_time,status,created
     </sql>
 
-    <insert id="insertAnswer" parameterType="Answer" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertAnswers" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO zn_answer(<include refid="fieldsA"/>)
-        VALUES (#{answerId},#{questionId},#{answerDetail},#{userId},#{userZn},#{result},#{expertId},
-        #{expertZn},#{basis},#{judgeTime},#{status},now())
+        VALUES
+        <foreach collection="list" item="answers" index="index" separator=",">
+            (#{answers.answerId},#{answers.questionId},#{answers.answerDetail},#{answers.userId},
+            #{answers.userZn},#{answers.result},#{answers.expertId},#{answers.expertZn},#{answers.basis},
+            #{answers.judgeTime},#{answers.status},now())
+        </foreach>
     </insert>
 
     <select id="getAnswerIdMax" resultType="java.lang.String">

@@ -44,7 +44,7 @@
     </profiles>
 
     <build>
-        <finalName>assignments</finalName>
+        <finalName>znks</finalName>
         <filters>
             <filter>../filter/${env}.properties</filter>
         </filters>
@@ -61,7 +61,7 @@
                 <version>2.4</version>
                 <configuration>
                     <archiveClasses>false</archiveClasses>
-                    <warName>znks_${env}}</warName>
+                    <warName>znks_${env}</warName>
                 </configuration>
             </plugin>
         </plugins>

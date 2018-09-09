@@ -2,6 +2,7 @@ package com.sh.znks.dao;
 
 import com.sh.znks.domain.user.ExpertUser;
 import com.sh.znks.domain.user.GeneralUser;
+import com.sh.znks.domain.user.WxUser;
 
 import java.util.List;
 
@@ -86,4 +87,13 @@ public interface UserDao {
      * @return
      */
     int updateExpInfoByPn(ExpertUser user);
+
+    /**
+     * 根据unionId取得微信用户登录信息
+     * @param unionId
+     * @return
+     */
+    WxUser getWxUserByUnionid(String unionId);
+
+    int insertWxUser(WxUser wxUser);
 }

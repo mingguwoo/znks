@@ -2,6 +2,7 @@ package com.sh.znks.web.interceptor;
 
 import com.sh.znks.common.base.AuthorHolder;
 import com.sh.znks.common.base.Constant;
+import com.sh.znks.common.base.util.ParamEditUtils;
 import com.sh.znks.common.base.util.RedisKeyConstant;
 import com.sh.znks.common.base.util.RedisUtils;
 import com.sh.znks.common.base.util.UrlUtils;
@@ -100,10 +101,6 @@ public class AccessInterceptor extends HandlerInterceptorAdapter {
                     res = true;
                 }
             }
-
-
-            //
-
         }
 
         return res;

@@ -71,4 +71,15 @@ public class LoginController {
 
         return userService.getPwdExpLoginInfo(phoneNumber, passwordEncrypt);
     }
+
+    @RequestMapping(value = "/general/wxAuthorizationGenLogin", method = RequestMethod.POST)
+    @ResponseBody
+    public ResultResponse wxAuthorizationGenLogin(String authorizationCode) {
+        //校验必填项
+        if (StringUtils.isBlank(authorizationCode)) {
+            return new ResultResponse(ResultCodeEnum.ZN_PARAM_ERR);
+        }
+
+        return userService.getxAuthorizationGenLoginInfo(authorizationCode);
+    }
 }
